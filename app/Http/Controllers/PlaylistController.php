@@ -9,9 +9,10 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
-
 class PlaylistController extends Controller
 {
+    // Méthodes existantes
+
     /**
      * Display a listing of the resource.
      */
@@ -68,7 +69,6 @@ class PlaylistController extends Controller
         return Inertia::render('Playlist/Show', [
             'playlist' => $playlist,
             'tracks' => $playlist->tracks,
-            // 'playlist' => $playlist->load('tracks'),
         ]);
     }
 
@@ -94,5 +94,14 @@ class PlaylistController extends Controller
     public function destroy(Playlist $playlist)
     {
         //
+    }
+
+    /**
+     * Get playlists for authenticated API user.
+     */
+    public function getUserPlaylists(Request $request)
+    {
+        $playlists = $request->user->playlists()->withCount(['tracks'])->get();
+        return response()->json($playlists);
     }
 }

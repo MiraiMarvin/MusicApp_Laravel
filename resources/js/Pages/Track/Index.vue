@@ -4,8 +4,9 @@
       Liste de mes musiques
     </template>
     <template #action>
-      <Link v-if="$page.props.isAdmin" :href="route('tracks.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded py-2 px-4">
-        Créer une musique
+      <Link :href="route('tracks.create')"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded py-2 px-4">
+      Créer une musique
       </Link>
     </template>
     <template #content>

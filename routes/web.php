@@ -1,53 +1,35 @@
 <?php
 
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TrackController;
-use App\Models\Track;
 use App\Http\Controllers\PlaylistController;
+use App\Http\Controllers\TrackController;
+use App\Http\Middleware\IsAdmin;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ApiKeyController;
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-
-Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-});
-
+Route::get('/', [TrackController::class, 'index'])->name('tracks.index');
 Route::get('/test', [HomeController::class, 'test'])->name('test');
 
-Route::name('tracks.')->prefix('tracks')->controller(TrackController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+    Route::resource('playlists', PlaylistController::class);
+
+    Route::controller(TrackController::class)
+        ->prefix('tracks')
+        ->name('tracks.')
+        ->middleware([IsAdmin::class])
+        ->group(function () {
             Route::get('/create', 'create')->name('create');
             Route::post('/', 'store')->name('store');
             Route::get('/{track}', 'show')->name('show');
             Route::get('/{track}/edit', 'edit')->name('edit');
             Route::put('/{track}', 'update')->name('update');
             Route::delete('/{track}', 'destroy')->name('destroy');
+    });
 });
 
-
-Route::resource('playlists', PlaylistController::class);
-
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('api-keys', [ApiKeyController::class, 'index'])->name('api-keys.index');
+    Route::get('api-keys/create', [ApiKeyController::class, 'create'])->name('api-keys.create');
+    Route::post('api-keys', [ApiKeyController::class, 'store'])->name('api-keys.store');
+    Route::delete('api-keys/{apiKey}', [ApiKeyController::class, 'destroy'])->name('api-keys.destroy');
+});

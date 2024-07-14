@@ -89,7 +89,7 @@ class TrackController extends Controller
             'title' => ['required', 'string', 'min:5', 'max:255'],
             'artist' => ['required', 'string', 'min:3', 'max:255'],
             'display' => ['required', 'boolean'],
-        ]);
+        ]); 
 
         $track->title = $request->title;
         $track->artist = $request->artist;
